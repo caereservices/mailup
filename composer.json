@@ -2,7 +2,8 @@
     "name": "caereservices/mailup",
     "description": "Mailup Interface Package",
     "keywords": ["template", "composer", "package"],
-    "license": "DBAD",
+    "homepage": "https://github.com/caereservices/mailup",
+    "license": "MIT",
     "authors": [
         {
             "name": "Massimo Villalta",
