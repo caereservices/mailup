@@ -1,3 +1,9 @@
+
+Mailup API Class for Laravel 5.x
+
+--- UNDER CONSTRUCTION !! ---
+
+
 Composer Library Template
 =========================
 
