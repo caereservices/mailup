@@ -1,6 +1,8 @@
 <?php
 
-class MailUpException extends Exception {
+namespace Caereservices\Mailup;
+
+class MailUpException extends \Exception {
 
     var $statusCode;
 

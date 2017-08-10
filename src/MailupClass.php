@@ -1,5 +1,7 @@
 <?php
 
+namespace Caereservices\Mailup;
+
     class MailupClass {
 
         var $logonEndpoint;
