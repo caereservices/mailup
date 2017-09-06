@@ -19,8 +19,12 @@ class MailupClient {
    private $listId = -1;
 
    function __construct($inClientId = "", $inClientSecret = "", $inCallbackUri = "") {
-      if( ($inClientId != "") && ($inClientSecret != "") && ($inCallbackUri != "") ) {
-         $this->mailUp = new MailupClass($inClientId, $inClientSecret, $inCallbackUri);
+      try {
+         if( ($inClientId != "") && ($inClientSecret != "") && ($inCallbackUri != "") ) {
+            $this->mailUp = new MailupClass($inClientId, $inClientSecret, $inCallbackUri);
+         }
+      } catch (MailUpException $e) {
+         // DO NOTHING AT THE MOMENT
       }
    }
 
@@ -68,20 +72,37 @@ class MailupClient {
       return json_encode($retVal);
    }
 
+   protected function create_list($listName = "") {
+      $listId = -1;
+      if( $listName != "" ) {
+         $listId = $this->get_list_id($listName);
+         if( $listId == -1 ) {
+            // TO DO: Creation of new List
+            //        Actually return ID of default Mailup List
+            $listId = 1;
+         }
+      }
+      return $listId;
+   }
+
    protected function get_list_id($listName = "") {
       $listId = -1;
       if( $listName != "" ) {
-         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List";
-         $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
-         if( $result === false ) return $listId;
-         $result = json_decode($result);
-         $arr = $result->Items;
-         for( $i = 0; $i < count($arr); $i++ ) {
-            $list = $arr[$i];
-            if( $listName == $list->Name) {
-               $listId = $list->IdList;
-               break;
+         try {
+            $url = $this->mailUp->getConsoleEndpoint() . "/Console/List";
+            $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
+            if( $result === false ) return $listId;
+            $result = json_decode($result);
+            $arr = $result->Items;
+            for( $i = 0; $i < count($arr); $i++ ) {
+               $list = $arr[$i];
+               if( $listName == $list->Name) {
+                  $listId = $list->IdList;
+                  break;
+               }
             }
+         } catch (MailUpException $e) {
+            // DO NOTHING AT THE MOMENT
          }
       }
       return $listId;
@@ -90,12 +111,16 @@ class MailupClient {
    protected function get_user_id($mail = "") {
       $itemID = -1;
       if( $mail != "" && $this->listId != -1 ) {
-         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Recipients/Subscribed?filterby=\"Email.Contains('" . $mail . "')\"";
-         $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
-         if( $result === false ) return $itemID;
-         $result = json_decode($result);
-         if( count($result->Items) > 0 ) {
-            $itemID = $result->Items[0]->idRecipient;
+         try {
+            $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Recipients/Subscribed?filterby=\"Email.Contains('" . $mail . "')\"";
+            $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
+            if( $result === false ) return $itemID;
+            $result = json_decode($result);
+            if( count($result->Items) > 0 ) {
+               $itemID = $result->Items[0]->idRecipient;
+            }
+         } catch (MailUpException $e) {
+            // DO NOTHING AT THE MOMENT
          }
       }
       return $itemID;
@@ -104,19 +129,23 @@ class MailupClient {
    protected function get_group_id($groupName = "") {
       $groupId = -1;
       if( $groupName != "" && $this->listId != -1 ) {
-         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Groups";
-         $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
-         if( $result === false ) return $groupId;
-         $result = json_decode($result);
-         if( isset($result->Items) ) {
-            $arr = $result->Items;
-            for( $i = 0; $i < count($arr); $i++ ) {
-               $group = $arr[$i];
-               if( $groupName == $group->Name) {
-                  $groupId = $group->idGroup;
-                  break;
+         try {
+            $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Groups";
+            $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
+            if( $result === false ) return $groupId;
+            $result = json_decode($result);
+            if( isset($result->Items) ) {
+               $arr = $result->Items;
+               for( $i = 0; $i < count($arr); $i++ ) {
+                  $group = $arr[$i];
+                  if( $groupName == $group->Name) {
+                     $groupId = $group->idGroup;
+                     break;
+                  }
                }
             }
+         } catch (MailUpException $e) {
+            // DO NOTHING AT THE MOMENT
          }
       }
       return $groupId;
@@ -125,32 +154,40 @@ class MailupClient {
    protected function create_group($groupName = "") {
       $groupId = -1;
       if( $groupName != "" && $this->listId != -1 ) {
-         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Group";
-         $groupRequest = "{\"Deletable\":true,\"Name\":\"" . $groupName . "\",\"Notes\":\"". $groupName . "\"}";
-         $result = $this->mailUp->callMethod($url, "POST", $groupRequest, "JSON");
-         if( $result === false ) return $groupId;
-         $result = json_decode($result);
-         $arr = $result->Items;
-         for( $i = 0; $i < count($arr); $i++ ) {
-            $group = $arr[$i];
-            if( $groupName == $group->Name) {
-               $groupId = $group->idGroup;
-               break;
+         try {
+            $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Group";
+            $groupRequest = "{\"Deletable\":true,\"Name\":\"" . $groupName . "\",\"Notes\":\"". $groupName . "\"}";
+            $result = $this->mailUp->callMethod($url, "POST", $groupRequest, "JSON");
+            if( $result === false ) return $groupId;
+            $result = json_decode($result);
+            $arr = $result->Items;
+            for( $i = 0; $i < count($arr); $i++ ) {
+               $group = $arr[$i];
+               if( $groupName == $group->Name) {
+                  $groupId = $group->idGroup;
+                  break;
+               }
             }
+         } catch (MailUpException $e) {
+            // DO NOTHING AT THE MOMENT
          }
       }
       return $groupId;
    }
 
    protected function create_mail_from_template($templateId = 0) {
-      $url = $mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email/Template/" . $templateId;
-      $result = $mailUp->callMethod($url, "POST", null, "JSON");
-      $result = json_decode($result);
-      if( count($result) > 0 ) {
-         $emailId = $result[0]->idMessage;
-         if( $emailId != 0 ) {
-            return $emailId;
+      try {
+         $url = $mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email/Template/" . $templateId;
+         $result = $mailUp->callMethod($url, "POST", null, "JSON");
+         $result = json_decode($result);
+         if( count($result) > 0 ) {
+            $emailId = $result[0]->idMessage;
+            if( $emailId != 0 ) {
+               return $emailId;
+            }
          }
+      } catch (MailUpException $e) {
+         // DO NOTHING AT THE MOMENT
       }
       return false;
    }
@@ -181,6 +218,10 @@ class MailupClient {
                if( $listName != "" ) {
                   $this->listId = $this->get_list_id($listName);
                   if( $this->listId == -1 ) {
+                     $this->listId = $this->create_list($listName);
+                     if( $this->listId > 0 ) {
+                        return MailupStatus::OK;
+                     }
                      return MailupStatus::ERR_LIST_NOT_FOUND;
                   }
                }
@@ -192,6 +233,28 @@ class MailupClient {
          }
       }
       return MailupStatus::ERR_INVALID_PARAMETER;
+   }
+
+   function changeList($listName = "") {
+      if( $this->clientLogged ) {
+         if( $listName != "" ) {
+            try {
+               $listId = $this->get_list_id($listName);
+               if( $listId == -1 ) {
+                  $listId = $this->create_list($listName);
+                  if( $listId > 0 ) {
+                     $this->listId = $listId;
+                     return MailupStatus::OK;
+                  }
+                  return MailupStatus::ERR_LIST_NOT_CREATED;
+               }
+            } catch (MailUpException $e) {
+               return MailupStatus::ERR_MAILUP_EXCEPTION;
+            }
+         }
+         return MailupStatus::ERR_INVALID_PARAMETER;
+      }
+      return MailupStatus::ERR_NOT_LOGGED_IN;
    }
 
    function delUserFromGroup($mail = "", $groupName = "") {

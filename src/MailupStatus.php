@@ -24,4 +24,6 @@ class MailupStatus {
    const ERR_UNKNOW_LIST = -26;
    const ERR_ADDING_USER = -27;
    const ERR_GETTING_DATA = -28;
+   const ERR_LIST_NOT_CREATED = -29;
+   const ERR_LIST_NOT_FOUND = -30;
 }
