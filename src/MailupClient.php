@@ -8,6 +8,7 @@ use Caereservices\Mailup\MailupClass as MailupClass;
 
 /**
 *  MailupClient Class - A Mailup.com platform API Interface
+*  https://github.com/caereservices/mailup
 *
 *  @author Massimo Villalta
 */
@@ -17,6 +18,15 @@ class MailupClient {
    private $clientLogged = false;
    private $listId = -1;
 
+   function __construct($inClientId = "", $inClientSecret = "", $inCallbackUri = "") {
+      if( ($inClientId != "") && ($inClientSecret != "") && ($inCallbackUri != "") ) {
+         $this->mailUp = new MailupClass($inClientId, $inClientSecret, $inCallbackUri);
+      }
+   }
+
+   /*
+       PRIVATE METHOD
+   */
    protected function makeRecipientsRequest($userData , $_dynafields) {
       if( !isset($userData["mail"]) || $userData["mail"] == "" ) return "";
       $fields = [];
@@ -60,16 +70,18 @@ class MailupClient {
 
    protected function get_list_id($listName = "") {
       $listId = -1;
-      $url = $this->mailUp->getConsoleEndpoint() . "/Console/List";
-      $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
-      if( $result === false ) return $listId;
-      $result = json_decode($result);
-      $arr = $result->Items;
-      for( $i = 0; $i < count($arr); $i++ ) {
-         $list = $arr[$i];
-         if( $listName == $list->Name) {
-            $listId = $list->IdList;
-            break;
+      if( $listName != "" ) {
+         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List";
+         $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
+         if( $result === false ) return $listId;
+         $result = json_decode($result);
+         $arr = $result->Items;
+         for( $i = 0; $i < count($arr); $i++ ) {
+            $list = $arr[$i];
+            if( $listName == $list->Name) {
+               $listId = $list->IdList;
+               break;
+            }
          }
       }
       return $listId;
@@ -77,19 +89,21 @@ class MailupClient {
 
    protected function get_user_id($mail = "") {
       $itemID = -1;
-      $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Recipients/Subscribed?filterby=\"Email.Contains('" . $mail . "')\"";
-      $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
-      if( $result === false ) return $itemID;
-      $result = json_decode($result);
-      if( count($result->Items) > 0 ) {
-         $itemID = $result->Items[0]->idRecipient;
+      if( $mail != "" && $this->listId != -1 ) {
+         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Recipients/Subscribed?filterby=\"Email.Contains('" . $mail . "')\"";
+         $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
+         if( $result === false ) return $itemID;
+         $result = json_decode($result);
+         if( count($result->Items) > 0 ) {
+            $itemID = $result->Items[0]->idRecipient;
+         }
       }
       return $itemID;
    }
 
    protected function get_group_id($groupName = "") {
       $groupId = -1;
-      if( $this->listId != -1 ) {
+      if( $groupName != "" && $this->listId != -1 ) {
          $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Groups";
          $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
          if( $result === false ) return $groupId;
@@ -110,7 +124,7 @@ class MailupClient {
 
    protected function create_group($groupName = "") {
       $groupId = -1;
-      if( $this->listId != -1 ) {
+      if( $groupName != "" && $this->listId != -1 ) {
          $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Group";
          $groupRequest = "{\"Deletable\":true,\"Name\":\"" . $groupName . "\",\"Notes\":\"". $groupName . "\"}";
          $result = $this->mailUp->callMethod($url, "POST", $groupRequest, "JSON");
@@ -159,12 +173,6 @@ class MailupClient {
    /*
        PUBLIC METHOD
    */
-   function __construct($inClientId = "", $inClientSecret = "", $inCallbackUri = "") {
-      if( ($inClientId != "") && ($inClientSecret != "") && ($inCallbackUri != "") ) {
-         $this->mailUp = new MailupClass($inClientId, $inClientSecret, $inCallbackUri);
-      }
-   }
-
    function login($user = "", $password = "", $listName = "") {
       if( $this->mailUp && ($user != "") && ($password != "") ) {
          try {
@@ -286,7 +294,7 @@ class MailupClient {
       if( $this->clientLogged ) {
          try {
             if( $this->listId != -1 ) {
-               $url = $this->mailup->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Templates";
+               $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Templates";
                $result = $this->mailUp->callMethod($url, "GET", null, "JSON");
                $retVal = json_decode($result);
                if( count($retVal) == 0 ) {

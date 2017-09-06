@@ -252,6 +252,7 @@ namespace Caereservices\Mailup;
             return $result;
         }
 
+        /*
         function loadToken() {
             if (isset($_COOKIE["access_token"])) $this->accessToken = $_COOKIE["access_token"];
             if (isset($_COOKIE["refresh_token"])) $this->refreshToken = $_COOKIE["refresh_token"];
@@ -261,6 +262,7 @@ namespace Caereservices\Mailup;
             setcookie("access_token", $this->accessToken, time()+60*60*24*30);
             setcookie("refresh_token", $this->refreshToken, time()+60*60*24*30);
         }
+        */
     }
 
 ?>
