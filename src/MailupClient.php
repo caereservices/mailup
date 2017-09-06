@@ -40,6 +40,12 @@ class MailupClient {
                $fields[] = $df;
             }
          }
+         if( $df["Description"] == "company" ) {
+            if( isset($userData["company"]) && $userData["company"] != "" ) {
+               $df["Value"] = $userData["company"];
+               $fields[] = $df;
+            }
+         }
       }
       $retVal = [
          "Email" => $userData["mail"],
