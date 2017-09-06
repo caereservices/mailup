@@ -119,8 +119,8 @@ namespace Caereservices\Mailup;
             header("Location: " . $url);
         }
         function logOnWithPassword($username, $password) {
-        	return $this->retreiveAccessToken($username, $password);
-		}
+        	 return $this->retreiveAccessToken($username, $password);
+		    }
         function retreiveAccessTokenWithCode($code) {
             $url = $this->getTokenEndpoint() . "?code=" . $code . "&grant_type=authorization_code";
 
