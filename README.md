@@ -2,6 +2,22 @@
 
 This class helps you to use the mailing functionality of MailUp platform with your Laravel 5.x framework.
 
+## Installation
+
+Using *composer* insert into **composer.json** the following block code:
+```
+"repositories": [
+        {
+            "url": "https://github.com/caereservices/mailup.git",
+            "type": "git"
+        }
+    ], ...
+    
+"require": {
+	 "caereservices/mailup": "dev-master", ...
+```
+then run **composer update**
+
 ### Initialization
 
 Following example show the basic steps for use this class in your code.
