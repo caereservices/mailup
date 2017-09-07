@@ -59,5 +59,8 @@ Return values:
 * **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
 * **MailupStatus::ERR_LIST_NOT_FOUND** - If *LISTNAME* is specified but not exist in Mailup platform
 
+## Reference
+For all reference and specification on API call for Mailup platform refer [here](http://help.mailup.com/display/mailupapi/Introducing+the+MailUp+API)
+
 ## Author
-* **Massimo Villalta** - *(c) 2017* - [Caereservices.it](http://www.caereservice.it)
+**Massimo Villalta** - *(c) 2017* - [Caereservices.it](http://www.caereservice.it)
