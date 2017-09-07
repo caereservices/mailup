@@ -175,7 +175,40 @@ class MailupClient {
       return $groupId;
    }
 
-   protected function create_mail_from_template($templateId = 0) {
+   protected function get_attachment($attach = "") {
+      if( $attach != "" ) {
+         $att = ["Data" => "", "Name" => ""];
+         if( file_exists($attach) || (substr(strtolower($attach), 0, 5) == "http:") ) {
+            $tmp = file_get_contents($attach);
+            if( $tmp !== false ) {
+               $att["Data"] = base64_encode($tmp);
+               $att["Name"] = pathinfo($attach, PATHINFO_BASENAME);
+               return $att;
+            }
+         }
+         return MailupStatus::ERR_ATTACH_FILE_NOT_EXIST;
+      }
+      return [];
+   }
+
+   protected function add_attachment($emailId = 0, $attach = []) {
+      try {
+         $attachReq = [
+            "Base64Data" => $attach["Data"],
+            "Name" => ($attach["Name"] != "" ? $attach["Name"] : "Allegato_1"),
+            "Slot" => 1,
+            "idList" => $this->listId,
+            "idMessage" => $emailId
+         ];
+         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email/" . $emailId . "/Attachment/1";
+         $result = $this->mailUp->callMethod($url, "POST", json_encode($attachReq), "JSON");
+         $result = json_decode($result);
+      } catch (MailUpException $e) {
+         // DO NOTHING AT THE MOMENT
+      }
+   }
+
+   protected function create_mail_from_template($templateId = 0, $attach = []) {
       try {
          $url = $mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email/Template/" . $templateId;
          $result = $mailUp->callMethod($url, "POST", null, "JSON");
@@ -183,6 +216,9 @@ class MailupClient {
          if( count($result) > 0 ) {
             $emailId = $result[0]->idMessage;
             if( $emailId != 0 ) {
+               if( count($attach) > 0 ) {
+                  $this->add_attachment($emailId, $attach);
+               }
                return $emailId;
             }
          }
@@ -192,7 +228,7 @@ class MailupClient {
       return false;
    }
 
-   protected function create_mail_from_message($subject = "", $message = "", $attach = "", $attachName = "") {
+   protected function create_mail_from_message($subject = "", $message = "", $attach = []) {
       try {
          $email = [
             "Subject" => str_replace("/", "\\/", $subject),
@@ -206,7 +242,7 @@ class MailupClient {
             "TrackingInfo" => [
                "CustomParams" => "",
                "Enabled" => true,
-               "Protocols" => ["http"]
+               "Protocols" => ["http", "https"]
             ]
          ];
          $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email";
@@ -214,17 +250,8 @@ class MailupClient {
          $result = json_decode($result);
          $emailId = $result->idMessage;
          if( $emailId != 0 ) {
-            if( $attach != "" ) {
-               $attachReq = [
-                  "Base64Data" => $attach,
-                  "Name" => ($attachName != "" ? $attachName : "Allegato_1"),
-                  "Slot" => 1,
-                  "idList" => $this->listId,
-                  "idMessage" => $emailId
-               ];
-               $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email/" . $emailId . "/Attachment/1";
-               $result = $this->mailUp->callMethod($url, "POST", json_encode($attachReq), "JSON");
-               $result = json_decode($result);
+            if( count($attach) > 0 ) {
+               $this->add_attachment($emailId, $attach);
             }
             return $emailId;
          }
@@ -449,23 +476,23 @@ class MailupClient {
       return MailupStatus::ERR_NOT_LOGGED_IN;
    }
 
-   function sendFromTemplate($templateId = 0, $groupName = "", $userMail) {
+   function sendFromTemplate($templateId = 0, $groupName = "", $userMail, $attach = "") {
       if( $this->clientLogged ) {
          if( $templateId != 0 ) {
-            //if( $groupName != "" || $userMail != "" ) {
-               $result = $this->create_mail_from_template($templateId);
-               if( (gettype($result) == "integer") && (intval($result) != 0) ) {
-                  if( $this->send_mail($result, $groupName, $userMail) ) {
-                     return MailupStatus::MESSAGE_SENDED;
-                  } else {
-                     return MailupStatus::ERR_MESSAGE_NOT_SENDED;
-                  }
+            $attachData = $this->get_attachment($attach);
+            if( !is_array($attachData) ) {
+               return $attachData;
+            }
+            $result = $this->create_mail_from_template($templateId, $attachData);
+            if( (gettype($result) == "integer") && (intval($result) != 0) ) {
+               if( $this->send_mail($result, $groupName, $userMail) ) {
+                  return MailupStatus::MESSAGE_SENDED;
                } else {
-                  return MailupStatus::ERR_CANT_CREATE_MESSAGE;
+                  return MailupStatus::ERR_MESSAGE_NOT_SENDED;
                }
-            /*} else {
-               return MailupStatus::ERR_NO_RECIPIENTS;
-            }*/
+            } else {
+               return MailupStatus::ERR_CANT_CREATE_MESSAGE;
+            }
          } else {
             return MailupStatus::ERR_NO_TEMPLATES;
          }
@@ -473,38 +500,26 @@ class MailupClient {
       return MailupStatus::ERR_NOT_LOGGED_IN;
    }
 
-   function sendMessage($subject = "", $message = "", $groupName = "", $userName = "", $attach = "") {
+   function sendMessage($subject = "", $message = "", $groupName = "", $userName, $attach = "") {
       if( $this->clientLogged ) {
-         //if( $groupName != "" || $userMail != "" ) {
-            $attachData = "";
-            $attachName = "";
-            if( ($attach != "") && (file_exists($attach) || (substr(strtolower($attach), 0, 5) == "http:")) ) {
-               $tmp = file_get_contents($attach);
-               if( $tmp !== false ) {
-                  $attachData = base64_encode($tmp);
-                  $attachName = pathinfo($attach, PATHINFO_BASENAME);
-               } else {
-                  return MailupStatus::ERR_ATTACH_FILE_NOT_EXIST;
-               }
+         if( $subject != "" && $message != "" ) {
+            $attachData = $this->get_attachment($attach);
+            if( !is_array($attachData) ) {
+               return $attachData;
             }
-            if( $subject != "" && $message != "" ) {
-               $result = $this->create_mail_from_message($subject, $message, $attachData, $attachName);
-               if( (gettype($result) == "integer") && (intval($result) != 0) ) {
-                  if( $this->send_mail($result, $groupName, $userName) ) {
-                     return MailupStatus::MESSAGE_SENDED;
-                  } else {
-                     return MailupStatus::ERR_MESSAGE_NOT_SENDED;
-                  }
+            $result = $this->create_mail_from_message($subject, $message, $attachData);
+            if( (gettype($result) == "integer") && (intval($result) != 0) ) {
+               if( $this->send_mail($result, $groupName, $userName) ) {
+                  return MailupStatus::MESSAGE_SENDED;
                } else {
-                  return MailupStatus::ERR_CANT_CREATE_MESSAGE;
+                  return MailupStatus::ERR_MESSAGE_NOT_SENDED;
                }
-               return MailupStatus::MESSAGE_SENDED;
             } else {
-               return MailupStatus::ERR_MESSAGE_TEXT_EMPTY;
+               return MailupStatus::ERR_CANT_CREATE_MESSAGE;
             }
-         /*} else {
-            return MailupStatus::ERR_NO_RECIPIENTS;
-         }*/
+         } else {
+            return MailupStatus::ERR_MESSAGE_TEXT_EMPTY;
+         }
       }
       return MailupStatus::ERR_NOT_LOGGED_IN;
    }
