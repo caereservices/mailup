@@ -15,7 +15,7 @@ $mailUp = null;
 try {
    $mailUp = new MailupClient($CLIENT_ID, $CLIENT_SECRET, $CALLBACK_URI);
    if( $mailUp ) {
-      $result = $mailUp->login($USER, $PASSWORD [, $LISTNAME]);
+      $result = $mailUp->login($USER, $PASSWORD, $LISTNAME);
       if( $result != MailupStatus::OK ) {
          $mailUp = null;
       }
@@ -27,6 +27,10 @@ try {
 ## Available Methods
 
 ### login
+```
+   $result = $mailUp->login(<USER>, <PASSWORD> [, <LISTNAME>]);
+```
+
 Parameter:
 * **USER** : Username for Mailup platform (usually *mXXXXX*)
 * **PASSWORD** : Password for Mailup platform
