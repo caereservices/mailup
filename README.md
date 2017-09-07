@@ -1,21 +1,34 @@
+MAILUP CLIENT CLASS for Laravel 5.x
+===================================
+(c) 2017 - Caereservice.it - Massimo Villalta
 
-Mailup API Class for Laravel 5.x
-
---- UNDER CONSTRUCTION !! ---
-
-
-Composer Library Template
-=========================
-
-If you are trying to create a new PHP Composer library, whether it will be going to submitted to packagist.org or just in your Github account, this template of files will surely help you make the process a lot easier and faster.
-
-Features
---------
-
-* PSR-4 autoloading compliant structure
-* Unit-Testing with PHPUnit
-* Comprehensive Guides and tutorial
-* Easy to use to any framework or even a plain php file
+This class helps you to use the mailing functionality of MailUp platform with your Laravel 5.x framework.
 
 
-I encourage that you put more information on this readme file instead of leaving it as is. See [http://www.darwinbiler.com/designing-and-making-the-readme-file-for-your-github-repository/](How to make a README file) for more info.
+Following example show the basic steps for use this class in your code.
+
+use Caereservices\Mailup\MailupStatus;
+use Caereservices\Mailup\MailupException;
+use Caereservices\Mailup\MailupClient;
+
+$mailUp = null;
+try {
+   $mailUp = new MailupClient(<CLIENT_ID>, <CLIENT_SECRET>, <CALLBACK_URI>);
+   if( $mailUp ) {
+      $result = $mailUp->login(<USER>, <PASSWORD>[, <LISTNAME>]);
+      if( $result != MailupStatus::OK ) {
+         $mailUp = null;
+      }
+   }
+} catch (MailupException $e) {
+   ...
+}
+
+----------------------------------------------------------
+AVAILABLE METHODS
+----------------------------------------------------------
+
+
+----------------------------------------------------------
+ERROR CODES
+----------------------------------------------------------
