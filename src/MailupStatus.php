@@ -26,4 +26,5 @@ class MailupStatus {
    const ERR_GETTING_DATA = -28;
    const ERR_LIST_NOT_CREATED = -29;
    const ERR_LIST_NOT_FOUND = -30;
+   const ERR_ATTACH_FILE_NOT_EXIST = -31;
 }

@@ -192,7 +192,7 @@ class MailupClient {
       return false;
    }
 
-   protected function create_mail_from_message($subject = "", $message = "") {
+   protected function create_mail_from_message($subject = "", $message = "", $attach = "", $attachName = "") {
       try {
          $email = [
             "Subject" => str_replace("/", "\\/", $subject),
@@ -214,6 +214,18 @@ class MailupClient {
          $result = json_decode($result);
          $emailId = $result->idMessage;
          if( $emailId != 0 ) {
+            if( $attach != "" ) {
+               $attachReq = [
+                  "Base64Data" => $attach,
+                  "Name" => ($attachName != "" ? $attachName : "Allegato_1"),
+                  "Slot" => 1,
+                  "idList" => $this->listId,
+                  "idMessage" => $emailId
+               ];
+               $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email/" . $emailId . "/Attachment/1";
+               $result = $this->mailUp->callMethod($url, "POST", json_encode($attachReq), "JSON");
+               $result = json_decode($result);
+            }
             return $emailId;
          }
       } catch (MailUpException $e) {
@@ -461,11 +473,22 @@ class MailupClient {
       return MailupStatus::ERR_NOT_LOGGED_IN;
    }
 
-   function sendMessage($subject = "", $message = "", $groupName = "", $userName = "") {
+   function sendMessage($subject = "", $message = "", $groupName = "", $userName = "", $attach = "") {
       if( $this->clientLogged ) {
          //if( $groupName != "" || $userMail != "" ) {
+            $attachData = "";
+            $attachName = "";
+            if( ($attach != "") && (file_exists($attach) || (substr(strtolower($attach), 0, 5) == "http:")) ) {
+               $tmp = file_get_contents($attach);
+               if( $tmp !== false ) {
+                  $attachData = base64_encode($tmp);
+                  $attachName = pathinfo($attach, PATHINFO_BASENAME);
+               } else {
+                  return MailupStatus::ERR_ATTACH_FILE_NOT_EXIST;
+               }
+            }
             if( $subject != "" && $message != "" ) {
-               $result = $this->create_mail_from_message($subject, $message);
+               $result = $this->create_mail_from_message($subject, $message, $attachData, $attachName);
                if( (gettype($result) == "integer") && (intval($result) != 0) ) {
                   if( $this->send_mail($result, $groupName, $userName) ) {
                      return MailupStatus::MESSAGE_SENDED;
