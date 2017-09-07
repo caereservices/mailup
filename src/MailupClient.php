@@ -255,17 +255,7 @@ class MailupClient {
          }
       }
       if( isset($userMail) && !is_array($userMail) && $userMail != "" ) {
-         $userId = $this->get_user_id($userMail);
-         if( $userId > 0 ) {
-            $url = $this->mailUp->getConsoleEndpoint() . "/Console/Email/Send";
-            $tmpData = [
-               "Email" => $userMail,
-               "idMessage" => $emailId
-            ];
-            $postData = json_encode($tmpData);
-         } else {
-            return false;
-         }
+         $userMail = [$userMail];
       }
       if( isset($userMail) && is_array($userMail) ) {
          return $this->send_mail_array($emailId, $userMail);
