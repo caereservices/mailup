@@ -192,18 +192,91 @@ class MailupClient {
       return false;
    }
 
-   protected function create_mail_from_message($message = "") {
-
+   protected function create_mail_from_message($subject = "", $message = "") {
+      try {
+         $email = [
+            "Subject" => str_replace("/", "\\/", $subject),
+            "idList" => $this->listId,
+            "Content" => str_replace("/", "\\/", $message),
+            "Embed" => true,
+            "IsConfirmation" => true,
+            "Fields" => [],
+            "Notes" => "",
+            "Tags" => [],
+            "TrackingInfo" => [
+               "CustomParams" => "",
+               "Enabled" => true,
+               "Protocols" => ["http"]
+            ]
+         ];
+         $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email";
+         $result = $this->mailUp->callMethod($url, "POST", json_encode($email), "JSON");
+         $result = json_decode($result);
+         $emailId = $result->idMessage;
+         if( $emailId != 0 ) {
+            return $emailId;
+         }
+      } catch (MailUpException $e) {
+         // DO NOTHING AT THE MOMENT
+      }
       return false;
    }
 
-   protected function send_mail($messageId = 0, $groupName = "", $userMail = "") {
+   protected function send_mail_array($emailId = 0, $userMails = []) {
+      try {
+         foreach( $userMails as $userMail ) {
+            $userId = $this->get_user_id($userMail);
+            if( $userId > 0 ) {
+               $url = $this->mailUp->getConsoleEndpoint() . "/Console/Email/Send";
+               $tmpData = [
+                  "Email" => $userMail,
+                  "idMessage" => $emailId
+               ];
+               $postData = json_encode($tmpData);
+               $result = $this->mailUp->callMethod($url, "POST", $postData, "JSON");
+            }
+         }
+         return true;
+      } catch (MailUpException $e) {
+         // DO NOTHING AT THE MOMENT
+      }
+      return false;
+   }
 
-      $groupId = -1;
+   protected function send_mail($emailId = 0, $groupName = "", $userMail) {
+      $postData = null;
+      $url = $this->mailUp->getConsoleEndpoint() . "/Console/List/" . $this->listId . "/Email/" . $emailId . "/Send";
       if( $groupName != "" ) {
          $groupId = $this->get_group_id($groupName);
+         if( $groupId > 0 ) {
+            $url = $this->mailUp->getConsoleEndpoint() . "/Console/Group/" . $groupId . "/Email/" . $emailId . "/Send";
+         } else {
+            return false;
+         }
       }
-
+      if( isset($userMail) && !is_array($userMail) && $userMail != "" ) {
+         $userId = $this->get_user_id($userMail);
+         if( $userId > 0 ) {
+            $url = $this->mailUp->getConsoleEndpoint() . "/Console/Email/Send";
+            $tmpData = [
+               "Email" => $userMail,
+               "idMessage" => $emailId
+            ];
+            $postData = json_encode($tmpData);
+         } else {
+            return false;
+         }
+      }
+      if( isset($userMail) && is_array($userMail) ) {
+         return $this->send_mail_array($emailId, $userMail);
+      } else {
+         try {
+            $result = $this->mailUp->callMethod($url, "POST", $postData, "JSON");
+            return true;
+         } catch (MailUpException $e) {
+            // DO NOTHING AT THE MOMENT
+         }
+      }
       return false;
    }
 
@@ -374,13 +447,13 @@ class MailupClient {
       return MailupStatus::ERR_NOT_LOGGED_IN;
    }
 
-   function sendFromTemplate($templateId = 0) {
+   function sendFromTemplate($templateId = 0, $groupName = "", $userMail) {
       if( $this->clientLogged ) {
          if( $templateId != 0 ) {
-            if( $groupName != "" || $userMail != "" ) {
+            //if( $groupName != "" || $userMail != "" ) {
                $result = $this->create_mail_from_template($templateId);
                if( (gettype($result) == "integer") && (intval($result) != 0) ) {
-                  if( $this->send_mail($result) ) {
+                  if( $this->send_mail($result, $groupName, $userMail) ) {
                      return MailupStatus::MESSAGE_SENDED;
                   } else {
                      return MailupStatus::ERR_MESSAGE_NOT_SENDED;
@@ -388,9 +461,9 @@ class MailupClient {
                } else {
                   return MailupStatus::ERR_CANT_CREATE_MESSAGE;
                }
-            } else {
+            /*} else {
                return MailupStatus::ERR_NO_RECIPIENTS;
-            }
+            }*/
          } else {
             return MailupStatus::ERR_NO_TEMPLATES;
          }
@@ -398,13 +471,13 @@ class MailupClient {
       return MailupStatus::ERR_NOT_LOGGED_IN;
    }
 
-   function sendMessage($message = "", $groupName = "", $userMail = "") {
+   function sendMessage($subject = "", $message = "", $groupName = "", $userName = "") {
       if( $this->clientLogged ) {
-         if( $groupName != "" || $userMail != "" ) {
-            if( $message != "" ) {
-               $result = $this->create_mail_from_message($message);
+         //if( $groupName != "" || $userMail != "" ) {
+            if( $subject != "" && $message != "" ) {
+               $result = $this->create_mail_from_message($subject, $message);
                if( (gettype($result) == "integer") && (intval($result) != 0) ) {
-                  if( $this->send_mail($result, $groupName, $userMail) ) {
+                  if( $this->send_mail($result, $groupName, $userName) ) {
                      return MailupStatus::MESSAGE_SENDED;
                   } else {
                      return MailupStatus::ERR_MESSAGE_NOT_SENDED;
@@ -416,9 +489,9 @@ class MailupClient {
             } else {
                return MailupStatus::ERR_MESSAGE_TEXT_EMPTY;
             }
-         } else {
+         /*} else {
             return MailupStatus::ERR_NO_RECIPIENTS;
-         }
+         }*/
       }
       return MailupStatus::ERR_NOT_LOGGED_IN;
    }
