@@ -24,9 +24,15 @@ try {
    ...
 }
 ```
-## AVAILABLE METHODS
+## Available Methods
 
-## ERROR CODES
+### login
+Parameter:
+* USER : Username for Mailup platform (usually mXXXXX)
+* PASSWORD : Password for Mailup platform
+* LISTNAME : *(optional)* The name of list of recipients to use
 
-## AUTHORS
+## Error Codes
+
+## Author
 * **Massimo Villalta** - *(c) 2017* - [Caereservices.it](http://www.caereservice.it)
