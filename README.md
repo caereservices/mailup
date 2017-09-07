@@ -28,7 +28,7 @@ try {
 
 ### login
 Parameter:
-* **USER** : Username for Mailup platform (usually mXXXXX)
+* **USER** : Username for Mailup platform (usually *mXXXXX*)
 * **PASSWORD** : Password for Mailup platform
 * **LISTNAME** : *(optional)* The name of list of recipients to use
 
