@@ -16,7 +16,7 @@ class MailupClient {
 
    private $mailUp = null;
    private $clientLogged = false;
-   private $listId = 1;
+   private $listId = -1;
 
    function __construct($inClientId = "", $inClientSecret = "", $inCallbackUri = "") {
       try {
@@ -72,14 +72,35 @@ class MailupClient {
       return json_encode($retVal);
    }
 
-   protected function create_list($listName = "") {
+   protected function create_list($listName = "", $list = []) {
       $listId = -1;
       if( $listName != "" ) {
          $listId = $this->get_list_id($listName);
          if( $listId == -1 ) {
-            // TO DO: Creation of new List
-            //        Actually return ID of default Mailup List
-            $listId = 1;
+            if( count($list) > 0 ) {
+               $listData = [
+                  "Name" => $list["name"],
+                  "Business" => true,
+                  "Customer" => true,
+                  "OwnerEmail" => $list["main_mail"],
+                  "ReplyTo" => $list["reply_to"],
+                  "NLSenderName" => $list["sender_name"],
+                  "CompanyName" => $list["company_name"],
+                  "ContactName" => $list["contact_name"],
+                  "Address" => $list["address"],
+                  "City" => $list["city"],
+                  "CountryCode" => $list["country_code"],
+                  "PermissionReminder" => $list["perm_remind"],
+                  "WebSiteUrl" => $list["web_site"],
+                  "UseDefaultSettings" => true
+               ];
+               try {
+               } catch (MailUpException $e) {
+                  // DO NOTHING AT THE MOMENT
+               }
+            } else {
+               $listId = 1;
+            }
          }
       }
       return $listId;
@@ -326,6 +347,8 @@ class MailupClient {
                      }
                      return MailupStatus::ERR_LIST_NOT_FOUND;
                   }
+               } else {
+                  $this->listId = 1;
                }
                return MailupStatus::OK;
             }
@@ -337,18 +360,62 @@ class MailupClient {
       return MailupStatus::ERR_INVALID_PARAMETER;
    }
 
-   function changeList($listName = "") {
+   function createList($listName = "", $listData = []) {
+       if( count($listData) > 0 ) {
+          if( !isset($listData["name"]) || ($listData["name"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["main_mail"]) || ($listData["main_mail"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["reply_to"]) || ($listData["reply_to"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["sender_name"]) || ($listData["sender_name"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["company_name"]) || ($listData["company_name"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["contact_name"]) || ($listData["contact_name"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["address"]) || ($listData["address"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["city"]) || ($listData["city"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["country_code"]) || ($listData["country_code"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["web_site"]) || ($listData["web_site"] == "") ) {
+             return MailupStatus::ERR_INVALID_LIST_DATA;
+          }
+          if( !isset($listData["perm_remind"]) ) {
+             $listData["perm_remind"] = "";
+          }
+          return $this->changeList($listName, $listData);
+       }
+       return MailupStatus::ERR_NO_LIST_DATA;
+   }
+
+   function changeList($listName = "", $listData = []) {
       if( $this->clientLogged ) {
          if( $listName != "" ) {
             try {
                $listId = $this->get_list_id($listName);
                if( $listId == -1 ) {
-                  $listId = $this->create_list($listName);
-                  if( $listId > 0 ) {
-                     $this->listId = $listId;
-                     return MailupStatus::OK;
+                  if( count($listData) > 0 ) {
+                     $listId = $this->create_list($listName, $listData);
+                     if( $listId > 0 ) {
+                        $this->listId = $listId;
+                        return MailupStatus::OK;
+                     }
+                     return MailupStatus::ERR_LIST_NOT_CREATED;
+                  } else {
+                     return MailupStatus::ERR_LIST_NOT_CHANGED;
                   }
-                  return MailupStatus::ERR_LIST_NOT_CREATED;
                }
             } catch (MailUpException $e) {
                return MailupStatus::ERR_MAILUP_EXCEPTION;
