@@ -95,6 +95,13 @@ class MailupClient {
                   "UseDefaultSettings" => true
                ];
                try {
+                  $url = $this->mailUp->getConsoleEndpoint() . "/Console/List";
+                  $result = $this->mailUp->callMethod($url, "POST", $listData, "JSON");
+                  if( $result === false ) return $listId;
+                  $result = json_decode($result);
+                  if( isset($result->IdList) ) {
+                     $listId = $result->IdList;
+                  }
                } catch (MailUpException $e) {
                   // DO NOTHING AT THE MOMENT
                }
