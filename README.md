@@ -27,11 +27,18 @@ use Caereservices\Mailup\MailupStatus;
 use Caereservices\Mailup\MailupException;
 use Caereservices\Mailup\MailupClient;
 
+$CLIENT_ID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+$CLIENT_SECRET = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+$CALLBACK_URI = "http://localhost/callback_uri";
+
+$USER = "mXXXXXX";
+$PASSWORD = "xxxxxxxxx";
+
 $mailUp = null;
 try {
    $mailUp = new MailupClient($CLIENT_ID, $CLIENT_SECRET, $CALLBACK_URI);
    if( $mailUp ) {
-      $result = $mailUp->login($USER, $PASSWORD, $LISTNAME);
+      $result = $mailUp->login($USER, $PASSWORD);
       if( $result != MailupStatus::OK ) {
          $mailUp = null;
       }
@@ -40,6 +47,8 @@ try {
    ...
 }
 ```
+**$CLIENT_ID** and **$CLIENT_SECRET** can be obtained follow these [guide](http://help.mailup.com/display/mailupapi/Authenticating+with+OAuth+v2)
+
 ## Available Methods
 
 ### login
