@@ -162,6 +162,7 @@ Return values:
    $result = $mailUp->sendFromTemplate(<TEMPLATEID>, <GROUPNAME>, <USERMAILS>, <ATTACHMENT>);
 ```
 **SUBJECT** and **MESSAGE** are obviously unnecessary :)
+
 Refer to **sendMessage** for most parameter and return values except follows
 
 Parameter:
