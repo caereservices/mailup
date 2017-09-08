@@ -113,6 +113,28 @@ Return values:
 * **MailupStatus::ERR_INVALID_USERDATA** - The *USERDATA* contains invalid data or incorrect field
 * **MailupStatus::ERR_ADDING_USER** - The user cannot be created (added)
 
+### addGroup
+```
+   $result = $mailUp->sendMessage(<SUBJECT>, <MESSAGE>, <GROUPNAME>, <USERMAILS>, <ATTACHMENT>);
+```
+Parameter:
+* **SUBJECT** - Subject of message
+* **MESSAGE** - Text of message (can be plain text or HTML)
+* **GROUPNAME** - The name of the group to send a message
+* **USERMAILS** - The mail of the user(s) to send a message, can be a single mail address or array of mail address
+* **ATTACHMENT** - Path to the file/image/other to attach at the message (MUST be, if present, absolute path to file, if it stay on the server, or URL), if the class don't found the attachment no data is attached to message
+
+If either of *GROUPNAME* and/or *USERMAILS* are specified ("" or null is passed) the message is sent to ALL recipients (users) present in the current List.
+
+Return values:
+* **MailupStatus::MESSAGE_SENDED** - The message is correctly queued and be sended as soon as possible
+* **MailupStatus::ERR_NOT_LOGGED_IN** - The method are called without make login
+* **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter ar invalid or empty
+* **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
+* **MailupStatus::ERR_MESSAGE_NOT_SENDED** - The message cannot be sended
+* **MailupStatus::ERR_CANT_CREATE_MESSAGE** - The system cannot create (prepare) the message before send it
+* **MailupStatus::ERR_MESSAGE_TEXT_EMPTY** - The *MESSAGE* parameter is empty or null
+
 ## Reference
 For all reference and specification on API call for Mailup platform refer [here](http://help.mailup.com/display/mailupapi/Introducing+the+MailUp+API)
 
