@@ -209,5 +209,7 @@ Return values:
 ## Reference
 For all reference and specification on API call for Mailup platform refer [here](http://help.mailup.com/display/mailupapi/Introducing+the+MailUp+API)
 
+Based on example code from [here](https://github.com/mailup/rest-samples-php/tree/master/MailUpExample)
+
 ## Author
 **Massimo Villalta** - *(c) 2017* - [Caereservices.it](http://www.caereservice.it)
