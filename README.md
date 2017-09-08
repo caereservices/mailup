@@ -89,6 +89,7 @@ Parameter:
 * *country_code* - Your country code (ex. IT)
 * *perm_remind* - Permission reminder (default "") see [here](http://help.mailup.com/display/mailupapi/Manage+Lists+and+Groups#ManageListsandGroups-Quicklistcreation) for information
 * *web_site* - Your website URL
+
 All fields are **mandatory**
 
 Return values:
