@@ -18,7 +18,7 @@ Using *composer* insert into **composer.json** the following code block:
 ```
 then run **composer update**
 
-### Get started
+## Get started
 
 Following example show the basic steps for use this class in your code.
 
