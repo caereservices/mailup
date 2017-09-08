@@ -89,6 +89,23 @@ Return values:
 * **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
 * **MailupStatus::ERR_CREATING_GROUPS** - The *GROUPNAME* not exist in Mailup platform and cannot be created
 
+### addUserToGroup
+```
+   $result = $mailUp->addUserToGroup(<USERDATA>, <GROUPNAME>);
+```
+Parameter:
+* **USERDATA** : Array with User data to be added to group
+* **GROUPNAME** : The name of the group
+
+Return values:
+* **MailupStatus::OK** - *User* created created or *User* exist in platform
+* **MailupStatus::ERR_NOT_LOGGED_IN** - The method are called without make login
+* **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter ar invalid or empty
+* **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
+* **MailupStatus::ERR_GETTING_FIELDS** This error is returned when we have a problem with dynamic fields of Mailup (see [here](http://help.mailup.com/display/mailupapi/Recipients#Recipients-Addasinglerecipient/subscriber-synchronousimport) for details)
+* **MailupStatus::ERR_INVALID_USERDATA** - The *USERDATA* contains invalid data or incorrect field
+* **MailupStatus::ERR_ADDING_USER** - The user cannot be created (added)
+
 ## Reference
 For all reference and specification on API call for Mailup platform refer [here](http://help.mailup.com/display/mailupapi/Introducing+the+MailUp+API)
 
