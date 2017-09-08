@@ -4,7 +4,7 @@ This class helps you to use the mailing functionality of MailUp platform with yo
 
 ## Installation
 
-Using *composer* insert into **composer.json** the following block code:
+Using *composer* insert into **composer.json** the following code block:
 ```
 "repositories": [
         {
