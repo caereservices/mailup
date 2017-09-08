@@ -68,14 +68,47 @@ Return values:
 * **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
 * **MailupStatus::ERR_LIST_NOT_FOUND** - If *LISTNAME* is specified but not exist in Mailup platform
 
-### changeList
+### createList
 ```
-   $result = $mailUp->changeList(<LISTNAME>);
+   $result = $mailUp->createList(<LISTNAME>, <LISTDATA>);
 ```
-If *LISTNAME* doesn't exist the class try to create immediately.
 
 Parameter:
 * **LISTNAME** : The name of list of recipients to use
+* **LISTDATA** : Array with fields for fill List data
+
+**LISTDATA Fields**
+* *name* - Name of the List
+* *main_mail* - Main email address linked to the list
+* *reply_to* - Mail address for reply from user
+* *sender_name* - Sender name that appear to user when receive mail
+* *company_name* - Your company name
+* *contact_name* - Contact name in company (unnecessary match *main_mail* or *reply_to* owner)
+* *address* - Your company address
+* *city* - Your company city
+* *country_code* - Your country code (ex. IT)
+* *perm_remind* - Permission reminder (default "") see [here](http://help.mailup.com/display/mailupapi/Manage+Lists+and+Groups#ManageListsandGroups-Quicklistcreation) for information
+* *web_site* - Your website URL
+All fields are **mandatory**
+
+Return values:
+* **MailupStatus::OK** - List created correctly
+* **MailupStatus::ERR_NOT_LOGGED_IN** - The method are called without make login
+* **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter ar invalid or empty
+* **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
+* **MailupStatus::ERR_LIST_NOT_CREATED** - The *LISTNAME* not exist in Mailup platform and cannot be created
+* **MailupStatus::ERR_NO_LIST_DATA** - The *LISTDATA* array is empty or null
+* **MailupStatus::ERR_INVALID_LIST_DATA** - The *LISTDATA* array have one or many fields empty or null
+
+### changeList
+```
+   $result = $mailUp->changeList(<LISTNAME> [, <LISTDATA>]);
+```
+If *LISTNAME* doesn't exist the and *LISTDATA* array is specified method try to create it
+
+Parameter:
+* **LISTNAME** : The name of list of recipients to use
+* **LISTDATA** : *(optional)* Array with fields for fill List data (see **createList** for array structure)
 
 Return values:
 * **MailupStatus::OK** - List changed correctly
@@ -83,6 +116,7 @@ Return values:
 * **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter ar invalid or empty
 * **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
 * **MailupStatus::ERR_LIST_NOT_CREATED** - The *LISTNAME* not exist in Mailup platform and cannot be created
+* **MailupStatus::ERR_LIST_NOT_CHANGED** - The *LISTNAME* is invalid and the current list remain unchanged
 
 ### addGroup
 ```
@@ -94,7 +128,7 @@ Parameter:
 Return values:
 * **(number > 0)** - *Group* created and it's ID are returned, if the *Group* exist the method return it's ID.
 * **MailupStatus::ERR_NOT_LOGGED_IN** - The method are called without make login
-* **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter ar invalid or empty
+* **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter are invalid or empty
 * **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
 * **MailupStatus::ERR_CREATING_GROUPS** - The *GROUPNAME* not exist in Mailup platform and cannot be created
 
@@ -110,13 +144,13 @@ Parameters:
 * *mail* - User email (**mandatory**)
 * *name* - User firstname
 * *surname* - User lastname
-* *mobile* - User mobile number without international prefix (es. +39xxxxxxx)
+* *mobile* - User mobile number without international prefix (ex. +39xxxxxxx)
 * *company* - User company name (if available)
 
 Return values:
 * **MailupStatus::OK** - *User* created created or *User* exist in platform
 * **MailupStatus::ERR_NOT_LOGGED_IN** - The method are called without make login
-* **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter ar invalid or empty
+* **MailupStatus::ERR_INVALID_PARAMETER** - One or many parameter are invalid or empty
 * **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
 * **MailupStatus::ERR_GETTING_FIELDS** This error is returned when we have a problem with dynamic fields of Mailup (see [here](http://help.mailup.com/display/mailupapi/Recipients#Recipients-Addasinglerecipient/subscriber-synchronousimport) for details)
 * **MailupStatus::ERR_INVALID_USERDATA** - The *USERDATA* contains invalid data or incorrect field
