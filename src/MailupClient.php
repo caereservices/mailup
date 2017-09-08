@@ -16,7 +16,7 @@ class MailupClient {
 
    private $mailUp = null;
    private $clientLogged = false;
-   private $listId = -1;
+   private $listId = 1;
 
    function __construct($inClientId = "", $inClientSecret = "", $inCallbackUri = "") {
       try {
