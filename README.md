@@ -124,7 +124,7 @@ Parameter:
 * **USERMAILS** - The mail of the user(s) to send a message, can be a single mail address or array of mail address
 * **ATTACHMENT** - Path to the file/image/other to attach at the message (MUST be, if present, absolute path to file, if it stay on the server, or URL), if the class don't found the attachment no data is attached to message
 
-If either of *GROUPNAME* and/or *USERMAILS* are specified ("" or null is passed) the message is sent to ALL recipients (users) present in the current List.
+If either of *GROUPNAME* and/or *USERMAILS* aren't specified ("" or null is passed) the message is sent to ALL recipients (users) present in the current List.
 
 Return values:
 * **MailupStatus::MESSAGE_SENDED** - The message is correctly queued and be sended as soon as possible
