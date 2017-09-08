@@ -57,9 +57,13 @@ try {
 ```
 
 Parameter:
+
 **USER** : Username for Mailup platform (usually *mXXXXX*)
+
 **PASSWORD** : Password for Mailup platform
+
 **LISTNAME** : *(optional)* The name of list of recipients to use, if not specified default list of Mailup is used
+
 
 Return values:
 **MailupStatus::OK** - logged in correctly
