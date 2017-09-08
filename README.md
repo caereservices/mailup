@@ -113,7 +113,7 @@ Return values:
 * **MailupStatus::ERR_INVALID_USERDATA** - The *USERDATA* contains invalid data or incorrect field
 * **MailupStatus::ERR_ADDING_USER** - The user cannot be created (added)
 
-### addGroup
+### sendMessage
 ```
    $result = $mailUp->sendMessage(<SUBJECT>, <MESSAGE>, <GROUPNAME>, <USERMAILS>, <ATTACHMENT>);
 ```
