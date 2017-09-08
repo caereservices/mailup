@@ -144,6 +144,32 @@ Return values:
 * **MailupStatus::ERR_CANT_CREATE_MESSAGE** - The system cannot create (prepare) the message before send it
 * **MailupStatus::ERR_MESSAGE_TEXT_EMPTY** - The *MESSAGE* parameter is empty or null
 
+### getTemplateList
+```
+   $result = $mailUp->getTemplateList();
+```
+Almost one Mail Template MUST be created belong Mailup platform before using this method and methods linked
+
+Return values:
+* **TemplateListStructure** - Template list present on Mailup platform
+* **MailupStatus::ERR_NO_TEMPLATES** - There isn't template in Mailup platform
+* **MailupStatus::ERR_NOT_LOGGED_IN** - The method are called without make login
+* **MailupStatus::ERR_MAILUP_EXCEPTION** - Mailup Platform exception
+* **MailupStatus::ERR_UNKNOW_LIST** - The current List have a problem
+
+### sendFromTemplate
+```
+   $result = $mailUp->sendFromTemplate(<TEMPLATEID>, <GROUPNAME>, <USERMAILS>, <ATTACHMENT>);
+```
+**SUBJECT** and **MESSAGE** are obviously unnecessary :)
+Refer to **sendMessage** for most parameter and return values except follows
+
+Parameter:
+* **TEMPLATEID** - Template's ID obtained from selected item of *getTemplateList* returned list
+
+Return values:
+* **MailupStatus::ERR_NO_TEMPLATES** - The template ID is incorrect or invalid
+
 ## Reference
 For all reference and specification on API call for Mailup platform refer [here](http://help.mailup.com/display/mailupapi/Introducing+the+MailUp+API)
 
