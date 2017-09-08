@@ -39,8 +39,8 @@ try {
    $mailUp = new MailupClient($CLIENT_ID, $CLIENT_SECRET, $CALLBACK_URI);
    if( $mailUp ) {
       $result = $mailUp->login($USER, $PASSWORD);
-      if( $result != MailupStatus::OK ) {
-         $mailUp = null;
+      if( $result == MailupStatus::OK ) {
+         ...
       }
    }
 } catch (MailupException $e) {
