@@ -56,7 +56,7 @@ try {
    $result = $mailUp->login(<USER>, <PASSWORD> [, <LISTNAME>]);
 ```
 
-Parameter:
+Parameters:
 * **USER** : Username for Mailup platform (usually *mXXXXX*)
 * **PASSWORD** : Password for Mailup platform
 * **LISTNAME** : *(optional)* The name of list of recipients to use, if not specified default list of Mailup is used
@@ -102,7 +102,7 @@ Return values:
 ```
    $result = $mailUp->addUserToGroup(<USERDATA>, <GROUPNAME>);
 ```
-Parameter:
+Parameters:
 * **USERDATA** : Array with User data to be added to group
 * **GROUPNAME** : The name of the group (can be a Group ID also)
 
@@ -126,7 +126,7 @@ Return values:
 ```
    $result = $mailUp->sendMessage(<SUBJECT>, <MESSAGE>, <GROUPNAME>, <USERMAILS>, <ATTACHMENT>);
 ```
-Parameter:
+Parameters:
 * **SUBJECT** - Subject of message
 * **MESSAGE** - Text of message (can be plain text or HTML)
 * **GROUPNAME** - The name of the group to send a message
