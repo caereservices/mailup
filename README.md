@@ -95,7 +95,14 @@ Return values:
 ```
 Parameter:
 * **USERDATA** : Array with User data to be added to group
-* **GROUPNAME** : The name of the group
+* **GROUPNAME** : The name of the group (can be a Group ID also)
+
+**USERDATA Fields**
+* *mail* - User email (**mandatory**)
+* *name* - User firstname
+* *surname* - User lastname
+* *mobile* - User mobile number without international prefix (es. +39xxxxxxx)
+* *company* - User company name (if available)
 
 Return values:
 * **MailupStatus::OK** - *User* created created or *User* exist in platform
