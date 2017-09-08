@@ -148,7 +148,7 @@ Return values:
 ```
    $result = $mailUp->getTemplateList();
 ```
-Almost one Mail Template MUST be created belong Mailup platform before using this method and methods linked
+Almost one Mail Template MUST be created belong Mailup platform before using this method and methods linked, you can find all information and guide on templates [here](http://help.mailup.com/display/MUG/List+building+tools)
 
 Return values:
 * **TemplateListStructure** - Template list present on Mailup platform
